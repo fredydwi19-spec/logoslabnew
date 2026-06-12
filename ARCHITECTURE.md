@@ -73,6 +73,7 @@ DATABASE_URL="mysql://root:<password>@localhost:3306/logoslab_dev"
 ## 5. API Routes & UI (ElysiaJS)
 | Method | Path | Handler / File | Keterangan |
 |---|---|---|---|
+| GET | `/assets/*` | `@elysiajs/static` | Melayani file statis dari folder `public/assets` |
 | GET | `/` | `src/views/landing.ts` | Landing Page (UI Frontend) |
 | GET | `/login` | `src/views/login.ts` | Halaman Login (UI Frontend) |
 | GET | `/register` | `src/views/register.ts` | Halaman Registrasi (UI Frontend) |

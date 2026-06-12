@@ -1,10 +1,14 @@
 import { Elysia } from "elysia";
+import { staticPlugin } from "@elysiajs/static";
 import { authRoutes } from "./routes/auth";
 import { renderLanding } from "./views/landing";
 import { renderLogin } from "./views/login";
 import { renderRegister } from "./views/register";
 
 const app = new Elysia()
+  // Melayani file statis dari folder public (misal: /assets/...)
+  .use(staticPlugin({ assets: "public", prefix: "/" }))
+  
   // Daftar route API Backend
   .use(authRoutes)
   

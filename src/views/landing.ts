@@ -5,7 +5,7 @@ export const renderLanding = () => {
     <!-- Navbar -->
     <nav class="bg-navy px-6 py-4 flex items-center justify-between shadow-md">
       <div class="flex items-center">
-        <img src="/public/assets/Logo LogosLAB.png" alt="LogosLAB Logo" class="h-10 w-auto object-contain bg-white/10 rounded px-2" />
+        <img src="/assets/Logo%20LogosLAB.png" alt="LogosLAB Logo" class="h-10 w-auto object-contain bg-white/10 rounded px-2" />
       </div>
       <div class="space-x-4">
         <a href="/login" class="text-white hover:text-gold transition-colors font-medium">Masuk</a>
