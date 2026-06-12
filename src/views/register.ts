@@ -5,7 +5,7 @@ export const renderRegister = () => {
     <div class="flex flex-1 items-center justify-center p-4">
       <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
         <div class="text-center mb-8">
-          <a href="/"><img src="/assets/Logo%20LogosLAB.png" alt="LogosLAB" class="h-16 w-auto mx-auto mb-6 bg-navy/5 p-2 rounded-xl" /></a>
+          <a href="/"><img src="/assets/LogosLAB.png" alt="LogosLAB" class="h-16 w-auto mx-auto mb-6 bg-navy/5 p-2 rounded-xl" /></a>
           <h1 class="font-display text-2xl font-bold text-navy">Buat Akun Baru</h1>
           <p class="text-slate-500 text-sm mt-2">Daftar untuk mulai pengalaman belajar Anda</p>
         </div>
