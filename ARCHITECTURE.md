@@ -66,14 +66,19 @@ DATABASE_URL="mysql://root:<password>@localhost:3306/logoslab_dev"
 ## 4. Skema Database (Tabel)
 | Tabel | File | Keterangan |
 |---|---|---|
-| `users` | `src/db/schema.ts` | Tabel placeholder — akan diperluas oleh fitur Autentikasi & RBAC (Issue #3) |
+| `users` | `src/db/schema.ts` | Menyimpan kredensial pengguna, hashed password, dan `role` (KETUA_TIM, PEMBUAT_MATERI, dsb.) |
 
 ---
 
-## 5. API Routes (ElysiaJS)
-| Method | Path | Handler | Keterangan |
+## 5. API Routes & UI (ElysiaJS)
+| Method | Path | Handler / File | Keterangan |
 |---|---|---|---|
-| GET | `/` | `src/index.ts` | Health check — mengembalikan "Hello World" |
+| GET | `/` | `src/views/landing.ts` | Landing Page (UI Frontend) |
+| GET | `/login` | `src/views/login.ts` | Halaman Login (UI Frontend) |
+| GET | `/register` | `src/views/register.ts` | Halaman Registrasi (UI Frontend) |
+| POST | `/api/auth/register` | `src/routes/auth.ts` | Endpoint registrasi akun baru (password hashed) |
+| POST | `/api/auth/login` | `src/routes/auth.ts` | Endpoint login, menghasilkan JWT Cookie (`session`) |
+| POST | `/api/auth/logout` | `src/routes/auth.ts` | Endpoint logout, menghapus Cookie |
 
 ---
 
@@ -81,13 +86,14 @@ DATABASE_URL="mysql://root:<password>@localhost:3306/logoslab_dev"
 | Issue | Judul | Status |
 |---|---|---|
 | [#1](https://github.com/fredydwi19-spec/logoslabnew/issues/1) | Inisiasi Proyek (Bun Boilerplate) | ✅ Selesai |
-| [#3](https://github.com/fredydwi19-spec/logoslabnew/issues/3) | Fitur Autentikasi: Login, Registrasi, dan RBAC | 🔲 Belum dikerjakan |
+| [#3](https://github.com/fredydwi19-spec/logoslabnew/issues/3) | Fitur Autentikasi: Login, Registrasi, dan RBAC | ✅ Didefinisikan ulang di #6 |
 | [#4](https://github.com/fredydwi19-spec/logoslabnew/issues/4) | Setup Koneksi Database MySQL (Drizzle ORM & Bun) | ✅ Selesai |
+| [#6](https://github.com/fredydwi19-spec/logoslabnew/issues/6) | Fitur: Entry Point - Landing Page, Login, dan RBAC Auth Backend | ✅ Selesai |
 
 ---
 
 ## 7. Catatan Arsitektural & Aturan
 - **Anti-Regression:** Jangan ubah `drizzle.config.ts`, `src/db/index.ts`, dan `.gitignore` tanpa perencanaan dari High Agent.
-- **DRY:** Semua akses database wajib melalui instance `db` yang diekspor dari `src/db/index.ts`.
-- **Keamanan:** Semua endpoint API wajib menggunakan validasi input dari Elysia `t` dan RBAC middleware setelah fitur autentikasi selesai.
+- **DRY:** Semua akses database wajib melalui instance `db` yang diekspor dari `src/db/index.ts`. Template UI dilibatkan lewat `src/views/layout.ts`.
+- **Keamanan:** Semua endpoint API wajib menggunakan validasi input dari Elysia `t` dan RBAC middleware. Sandi wajib menggunakan `Bun.password.hash()`. Sesi diamankan dengan HTTP-Only Cookie.
 - **Konvensi Commit:** Gunakan format `feat:`, `fix:`, `chore:`, `docs:` pada pesan commit.
