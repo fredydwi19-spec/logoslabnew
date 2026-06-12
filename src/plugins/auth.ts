@@ -15,12 +15,13 @@ export const authPlugin = new Elysia({ name: "plugin.auth" })
     })
   )
   .use(cookie())
-  .derive(async ({ jwt, cookie: { session } }) => {
+  .derive(async ({ jwt, cookie }) => {
     return {
       getCurrentUser: async () => {
-        if (!session.value) return null;
+        const sessionValue = cookie?.session?.value;
+        if (!sessionValue) return null;
         try {
-          const payload = await jwt.verify(session.value);
+          const payload = await jwt.verify(sessionValue as string);
           if (!payload) return null;
           return payload as { id: number; email: string; role: string };
         } catch (error) {
@@ -30,11 +31,12 @@ export const authPlugin = new Elysia({ name: "plugin.auth" })
     };
   });
 
-export const requireAuth = (app: Elysia) =>
-  app.use(authPlugin).onBeforeHandle(async ({ getCurrentUser, set }) => {
-    const user = await getCurrentUser();
+export const requireAuth = new Elysia({ name: "require.auth" })
+  .use(authPlugin)
+  .onBeforeHandle(async (ctx: any) => {
+    const user = await ctx.getCurrentUser();
     if (!user) {
-      set.status = 401;
+      ctx.set.status = 401;
       return { success: false, message: "Unauthorized" };
     }
   });

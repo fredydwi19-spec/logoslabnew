@@ -47,7 +47,7 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
   })
 
   // Endpoint: Login
-  .post("/login", async ({ body, jwt, set, cookie: { session } }) => {
+  .post("/login", async ({ body, jwt, set, cookie }) => {
     const { email, password } = body;
 
     // Find user
@@ -71,13 +71,15 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
       role: user.role,
     });
 
-    // Set cookie
-    session.set({
-      value: token,
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 7 * 86400, // 7 days
-    });
+    // Set cookie (TypeScript expects cookie object to potentially miss 'session', so we use non-null assertion or optional chaining)
+    if (cookie.session) {
+      cookie.session.set({
+        value: token,
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 7 * 86400, // 7 days
+      });
+    }
 
     return { success: true, role: user.role };
   }, {
@@ -88,7 +90,9 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
   })
 
   // Endpoint: Logout
-  .post("/logout", ({ cookie: { session } }) => {
-    session.remove();
+  .post("/logout", ({ cookie }) => {
+    if (cookie.session) {
+      cookie.session.remove();
+    }
     return { success: true, message: "Berhasil logout" };
   });
