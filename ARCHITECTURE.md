@@ -15,13 +15,24 @@
 ## 2. Directory Structure
 ```text
 logoslabnew/
+├── public/
+│   └── assets/           # File statis publik (misal: logo)
 ├── scripts/
+│   ├── seed-admin.ts     # Skrip seeder untuk akun Ketua Tim (Admin)
 │   └── test-db.ts        # Skrip one-time untuk uji koneksi database
 ├── src/
 │   ├── db/
 │   │   ├── index.ts      # ⭐ Entry point koneksi database (Drizzle + mysql2 pool)
-│   │   ├── db.ts         # (Legacy) Koneksi awal — tidak digunakan, akan dihapus
 │   │   └── schema.ts     # Definisi skema tabel Drizzle ORM
+│   ├── plugins/
+│   │   └── auth.ts       # Konfigurasi plugin autentikasi (JWT & Cookie)
+│   ├── routes/
+│   │   └── auth.ts       # Endpoint API untuk login, register, dan logout
+│   ├── views/
+│   │   ├── layout.ts     # Fungsi helper wrapper HTML (Tailwind & Fonts)
+│   │   ├── landing.ts    # UI Landing Page
+│   │   ├── login.ts      # UI Login Page
+│   │   └── register.ts   # UI Register Page
 │   └── index.ts          # Entry point server ElysiaJS (port 3000)
 ├── drizzle/              # Output hasil drizzle-kit generate (SQL migration files)
 ├── drizzle.config.ts     # Konfigurasi Drizzle Kit (schema path, dialek mysql, credentials)
