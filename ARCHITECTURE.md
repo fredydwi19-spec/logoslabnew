@@ -109,3 +109,87 @@ DATABASE_URL="mysql://root:<password>@localhost:3306/logoslab_dev"
 - **DRY:** Semua akses database wajib melalui instance `db` yang diekspor dari `src/db/index.ts`. Template UI dilibatkan lewat `src/views/layout.ts`.
 - **Keamanan:** Semua endpoint API wajib menggunakan validasi input dari Elysia `t` dan RBAC middleware. Sandi wajib menggunakan `Bun.password.hash()`. Sesi diamankan dengan HTTP-Only Cookie.
 - **Konvensi Commit:** Gunakan format `feat:`, `fix:`, `chore:`, `docs:` pada pesan commit.
+
+---
+
+# LOGOSLAB ARCHITECTURE BLUEPRINT - MULTIROLE & SMART LEARNING PATH
+
+## 8. CORE TECH STACK
+- Runtime: Bun
+- Backend Framework: ElysiaJS (Monolithic UI & API Presentation)
+- ORM: Drizzle ORM
+- Database: MySQL
+- UI Styling: Tailwind CSS & Bootstrap Icons (Inline SVG/Local)
+- Theme Principle: Clean Visual Theme (60% Off-White background, 30% Deep Navy #1A237E Elements, 10% Vibrant Orange #FF5722 / Electric Gold #FFC107 Actions)
+
+## 9. DATABASE RELATIONAL SCHEMA (INTEGRATED BLUEPRINT)
+### users
+- id (int, PK, Serial)
+- name (varchar)
+- email (varchar, Unique)
+- password (varchar, Hashed)
+- role (enum: 'ketua_tim', 'pembuat_materi', 'pembuat_game', 'pakar', 'siswa')
+- status (enum: 'pending', 'active', 'inactive' - Default: 'pending')
+
+### courses
+- id (int, PK, Serial)
+- title (varchar)
+- description (text)
+- status (enum: 'draft', 'revision_needed', 'review', 'approved', 'published' - Default: 'draft')
+- content_author_id (int, FK -> users.id)
+- game_creator_id (int, FK -> users.id)
+- expert_reviewer_id (int, FK -> users.id)
+
+### contents
+- id (int, PK, Serial)
+- course_id (int, FK -> courses.id, Cascade Delete)
+- title (varchar)
+- body (text/markdown)
+- indicator_tag (enum: 'kognitif', 'metodologis', 'kontekstual')
+
+### games
+- id (int, PK, Serial)
+- course_id (int, FK -> courses.id, Cascade Delete)
+- game_type (enum: 'pilihan_ganda', 'puzzle', 'pasang_kata')
+- config_data (json) -> Menyimpan array pertanyaan dengan "indicator_tag" di dalam tiap objek soal.
+
+### reviews
+- id (int, PK, Serial)
+- course_id (int, FK -> courses.id, Cascade Delete)
+- reviewer_id (int, FK -> users.id)
+- comment (text)
+- status_recommendation (enum: 'revision_needed', 'approved')
+
+### student_profiles
+- id (int, PK, Serial)
+- user_id (int, FK -> users.id, Cascade Delete)
+- cognitive_score (int, default 0)
+- methodological_score (int, default 0)
+- contextual_score (int, default 0)
+- current_level (enum: 'dasar', 'menengah', 'mahir' - Default: 'dasar')
+
+## 10. DASHBOARD MAP & WORKFLOW SPECIFICATION
+
+### GLOBAL SIDEBAR UX
+- System: Iconic Collapsible Sidebar. Default width: 16 (Compact, icons only). Hover/Expand width: 64 (Shows text).
+- Animation: Tailwind `transition-all duration-300 ease-in-out`.
+
+### A. KETUA TIM DASHBOARD
+1. Ringkasan (`bi-grid-1x2-fill`): Menampilkan Stat Cards berbasis Query COUNT dinamis (Bukan nilai statis di tabel users).
+2. Manajemen Proyek (`bi-kanban`): Grid proyek aktif + Tombol Orange `[+] Buat Proyek Baru`. Klik tombol membuka modal pop-up untuk alokasi PIC awal.
+3. Manajemen Tim (`bi-people-fill`): Pusat persetujuan pendaftaran akun baru (Approval Queue) & monitoring beban kerja real-time via SQL Aggregation Count (Menghitung proyek aktif yang belum 'published').
+4. Kontrol Rilis (`bi-shield-check`): Daftar modul berstatus 'approved' untuk dirilis mutlak menjadi 'published' dengan satu klik tombol Orange.
+
+### B. PEMBUAT MATERI WORKSPACE
+1. Editor Modul (`bi-pencil-square`): Text area untuk menulis isi draf. Dilengkapi pilihan wajib `indicator_tag`. Klik `[AJUKAN KE PAKAR]` mengubah status course menjadi 'review' dan mengunci editor menjadi Read-Only.
+2. Log Catatan Pakar (`bi-chat-left-text-fill`): Menampilkan riwayat kritik dari tabel `reviews` jika status kembali ke 'revision_needed'.
+
+### C. PEMBUAT GAME STUDIO
+1. Studio Game (`bi-controller`): Split-Screen Layout. Sisi kiri merender teks `contents` (Read-Only), sisi kanan form input kuis/game. Klik `[SEMATKAN GAME]` menyimpan konfigurasi ke tabel `games` dalam format JSON bertag indikator keagamaan Kristen/Alkitabiah.
+
+### D. PAKAR EVALUASI PANEL
+1. Antrean Tinjauan (`bi-clipboard-check-fill`): Menampilkan proyek berstatus 'review'. Menyediakan Live Preview Simulator (Gabungan teks materi dan game interaktif yang bisa diuji klik). Menyediakan form evaluasi untuk aksi tombol `[MINTA REVISI]` atau `[SETUJUI / APPROVE]`.
+
+## 11. SMART E-LEARNING BRIDGE INTERACTION
+- System Engine: Backend ElysiaJS mencocokkan `student_profiles.current_level` dengan `contents.indicator_tag` dan data JSON di `games.config_data`.
+- Data Integration: Tim bertindak sebagai penyuplai data berlabel, sistem web bertindak sebagai penyaring konten adaptif di sisi dashboard Siswa secara real-time.
