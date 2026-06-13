@@ -5,7 +5,7 @@ export const renderSidebar = (role: string) => `
   <aside class="fixed left-0 top-0 h-screen bg-navy text-white w-16 hover:w-64 transition-all duration-300 ease-in-out overflow-hidden z-50 shadow-xl group">
     <div class="flex flex-col h-full">
       <div class="p-4 flex items-center justify-center group-hover:justify-start overflow-hidden border-b border-blue-800">
-        <img src="/public/assets/Logo LogosLAB.png" alt="LogosLAB Logo" class="h-8 w-auto shrink-0" />
+        <img src="/assets/Logo LogosLAB.png" alt="LogosLAB Logo" class="h-8 w-auto shrink-0" />
         <span class="ml-4 font-display font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-lg">LogosLAB</span>
       </div>
       <nav class="flex-1 mt-4 flex flex-col gap-1 overflow-y-auto overflow-x-hidden">
