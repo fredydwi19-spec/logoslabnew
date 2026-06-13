@@ -17,7 +17,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Stat Cards berbasis Query COUNT dinamis (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Ringkasan Ketua Tim", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Ringkasan Ketua Tim", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
     .get("/proyek", (ctx: any) => {
       const content = `
@@ -26,7 +26,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Grid proyek aktif dan tombol Buat Proyek Baru (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Manajemen Proyek", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Manajemen Proyek", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
     .get("/tim", (ctx: any) => {
       const content = `
@@ -35,7 +35,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Pusat persetujuan akun baru dan monitoring beban kerja (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Manajemen Tim", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Manajemen Tim", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
     .get("/rilis", (ctx: any) => {
       const content = `
@@ -44,7 +44,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Daftar modul berstatus 'approved' untuk dirilis (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Kontrol Rilis", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Kontrol Rilis", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
   )
 
@@ -60,7 +60,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Text area untuk menulis isi draf dan pemilihan indicator_tag (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Editor Modul", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Editor Modul", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
     .get("/log", (ctx: any) => {
       const content = `
@@ -69,7 +69,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Menampilkan riwayat kritik dari tabel reviews (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Log Catatan Pakar", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Log Catatan Pakar", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
   )
 
@@ -85,7 +85,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Split-Screen Layout. Kiri: Materi teks. Kanan: Form input kuis (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Studio Game", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Studio Game", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
   )
 
@@ -101,7 +101,7 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Menampilkan proyek berstatus 'review' dan Live Preview Simulator (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Antrean Tinjauan", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Antrean Tinjauan", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
   )
 
@@ -117,6 +117,6 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           <p class="text-gray-600">Dashboard Siswa (Akan diimplementasikan).</p>
         </div>
       `;
-      return htmlLayout("Dashboard Siswa", content, ctx.userRole || undefined);
+      return new Response(htmlLayout("Dashboard Siswa", content, ctx.userRole || undefined), { headers: { "Content-Type": "text/html" } });
     })
   );
