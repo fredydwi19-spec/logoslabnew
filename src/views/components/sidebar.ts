@@ -5,7 +5,7 @@ export const renderSidebar = (role: string) => `
   <aside class="fixed left-0 top-0 h-screen bg-navy text-white w-16 hover:w-64 transition-all duration-300 ease-in-out overflow-hidden z-50 shadow-xl group">
     <div class="flex flex-col h-full">
       <div class="p-4 flex items-center justify-center group-hover:justify-start overflow-hidden border-b border-blue-800">
-        <i class="bi bi-box-fill text-gold text-2xl shrink-0"></i>
+        <img src="/public/assets/Logo LogosLAB.png" alt="LogosLAB Logo" class="h-8 w-auto shrink-0" />
         <span class="ml-4 font-display font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-lg">LogosLAB</span>
       </div>
       <nav class="flex-1 mt-4 flex flex-col gap-1 overflow-y-auto overflow-x-hidden">
@@ -78,9 +78,21 @@ const getMenuByRole = (role: string) => {
 
   if (role === 'siswa') {
     return `
+      <a href="/dashboard/siswa/diagnostik" class="flex items-center p-3 mx-2 rounded-lg hover:bg-blue-800 transition-colors">
+        <i class="bi bi-clipboard-data-fill text-xl shrink-0 w-8 text-center text-gray-200"></i>
+        <span class="ml-2 whitespace-nowrap font-medium text-gray-100">Kuis Pemetaan</span>
+      </a>
       <a href="/dashboard/siswa" class="flex items-center p-3 mx-2 rounded-lg hover:bg-blue-800 transition-colors">
-        <i class="bi bi-book-half text-xl shrink-0 w-8 text-center text-gray-200"></i>
-        <span class="ml-2 whitespace-nowrap font-medium text-gray-100">Belajar</span>
+        <i class="bi bi-journal-bookmark-fill text-xl shrink-0 w-8 text-center text-gray-200"></i>
+        <span class="ml-2 whitespace-nowrap font-medium text-gray-100">Ruang Kelas Adaptif</span>
+      </a>
+      <a href="/dashboard/siswa/belajar" class="flex items-center p-3 mx-2 rounded-lg hover:bg-blue-800 transition-colors">
+        <i class="bi bi-play-btn-fill text-xl shrink-0 w-8 text-center text-gray-200"></i>
+        <span class="ml-2 whitespace-nowrap font-medium text-gray-100">Mode Belajar</span>
+      </a>
+      <a href="/dashboard/siswa/leaderboard" class="flex items-center p-3 mx-2 rounded-lg hover:bg-blue-800 transition-colors">
+        <i class="bi bi-trophy-fill text-xl shrink-0 w-8 text-center text-gray-200"></i>
+        <span class="ml-2 whitespace-nowrap font-medium text-gray-100">Leaderboard</span>
       </a>
     `;
   }

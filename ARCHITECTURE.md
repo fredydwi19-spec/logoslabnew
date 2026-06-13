@@ -168,28 +168,182 @@ DATABASE_URL="mysql://root:<password>@localhost:3306/logoslab_dev"
 - contextual_score (int, default 0)
 - current_level (enum: 'dasar', 'menengah', 'mahir' - Default: 'dasar')
 
-## 10. DASHBOARD MAP & WORKFLOW SPECIFICATION
+## 10. DASHBOARD & WORKSPACE CORE LOGOSLAB (V2 - INTEGRATED)
+### I. SPESIFIKASI GLOBAL UI & NAVIGASI
+- Komponen Utama: Iconic Collapsible Sidebar.
+- Dimensi & Perilaku: Default width saat menciut adalah w-16 (hanya menampilkan ikon Bootstrap) dan mengembang menjadi w-64 saat kursor diarahkan (hover) untuk menampilkan teks label menu.
+- Animasi: Menggunakan utilitas transisi bawaan Tailwind CSS (transition-all duration-300 ease-in-out).
+- Aset Visual: Logo resmi LogosLAB wajib diletakkan secara permanen di bagian atas sidebar menggunakan relative path /public/assets/Logo LogosLAB.png.
+- Aturan Warna Baku (60-30-10):
+    - 60% (Dominan): Putih / off-white sebagai warna latar belakang area konten utama dashboard untuk menjaga kebersihan visual (clean theme).
+    - 30% (Struktural): Deep Navy (#1A237E) digunakan eksklusif untuk Sidebar, Top Navbar, dan pembatas komponen struktural.
+    - 10% (Aksen/Aksi): Vibrant Orange murni untuk Tombol Aksi Utama (Call to Action/CTA) dan Electric Gold (#FFC107) khusus untuk penanda status penting/minimalis.
 
-### GLOBAL SIDEBAR UX
-- System: Iconic Collapsible Sidebar. Default width: 16 (Compact, icons only). Hover/Expand width: 64 (Shows text).
-- Animation: Tailwind `transition-all duration-300 ease-in-out`.
+### II. PEMETAAN MENU & SKEMA PENGGUNAAN BERDASARKAN ROLE
+#### A. KETUA TIM DASHBOARD (Workspace Kontrol & Approval)
+- Menu 1: Ringkasan Eksekutif (bi-grid-1x2-fill)
+    - Fungsi: Menampilkan kartu statistik performa sistem (Total Proyek Aktif, Modul dalam Review, Anggota Tim Aktif, Total Siswa Terdaftar).
+    - Skema Data: Data angka wajib diambil langsung melalui agregasi query COUNT dinamis dari MySQL saat halaman dimuat, bukan membaca nilai statis dari tabel.
 
-### A. KETUA TIM DASHBOARD
-1. Ringkasan (`bi-grid-1x2-fill`): Menampilkan Stat Cards berbasis Query COUNT dinamis (Bukan nilai statis di tabel users).
-2. Manajemen Proyek (`bi-kanban`): Grid proyek aktif + Tombol Orange `[+] Buat Proyek Baru`. Klik tombol membuka modal pop-up untuk alokasi PIC awal.
-3. Manajemen Tim (`bi-people-fill`): Pusat persetujuan pendaftaran akun baru (Approval Queue) & monitoring beban kerja real-time via SQL Aggregation Count (Menghitung proyek aktif yang belum 'published').
-4. Kontrol Rilis (`bi-shield-check`): Daftar modul berstatus 'approved' untuk dirilis mutlak menjadi 'published' dengan satu klik tombol Orange.
+- Menu 2: Manajemen Proyek (bi-kanban)
+    - Fungsi: Menampilkan grid kartu proyek e-learning yang sedang berjalan.
+- Skema Data: Terdapat tombol aksen Orange [+] Buat Proyek Baru. Jika diklik, sistem membuka modal pop-up interaktif untuk menginput Judul Proyek, Deskripsi, dan memilih PIC awal dengan memetakan ID pengguna ke kolom content_author_id, game_creator_id, dan expert_reviewer_id pada tabel courses. Status default proyek otomatis terisi draft.
 
-### B. PEMBUAT MATERI WORKSPACE
-1. Editor Modul (`bi-pencil-square`): Text area untuk menulis isi draf. Dilengkapi pilihan wajib `indicator_tag`. Klik `[AJUKAN KE PAKAR]` mengubah status course menjadi 'review' dan mengunci editor menjadi Read-Only.
-2. Log Catatan Pakar (`bi-chat-left-text-fill`): Menampilkan riwayat kritik dari tabel `reviews` jika status kembali ke 'revision_needed'.
+-Menu 3: Manajemen Tim & Approval Queue (bi-people-fill)
+    - Fungsi: Pusat persetujuan pendaftaran akun baru bagi kolaborator internal dan monitoring beban kerja tim.
+    - Skema Data: Menampilkan daftar pengguna dari tabel users yang berstatus pending. Ketua Tim dapat melakukan klik Approve untuk mengubah status menjadi active. Sistem juga menampilkan grafik/angka beban kerja yang dihitung via SQL Aggregation Count (menghitung berapa banyak proyek aktif di tabel courses berstatus non-published yang sedang dipegang oleh masing-masing PIC).
 
-### C. PEMBUAT GAME STUDIO
-1. Studio Game (`bi-controller`): Split-Screen Layout. Sisi kiri merender teks `contents` (Read-Only), sisi kanan form input kuis/game. Klik `[SEMATKAN GAME]` menyimpan konfigurasi ke tabel `games` dalam format JSON bertag indikator keagamaan Kristen/Alkitabiah.
+Menu 4: Kontrol Rilis Modul (bi-shield-check)
+    - Fungsi: Gerbang akhir publikasi materi ke sisi siswa.
+    - Skema Data: Menampilkan daftar modul yang telah berstatus approved (sudah lolos uji Pakar di tabel courses). Ketua Tim dapat menekan satu tombol Orange untuk mengubah status modul dari approved menjadi published, sehingga modul tersebut seketika muncul di halaman siswa.
 
-### D. PAKAR EVALUASI PANEL
-1. Antrean Tinjauan (`bi-clipboard-check-fill`): Menampilkan proyek berstatus 'review'. Menyediakan Live Preview Simulator (Gabungan teks materi dan game interaktif yang bisa diuji klik). Menyediakan form evaluasi untuk aksi tombol `[MINTA REVISI]` atau `[SETUJUI / APPROVE]`.
+#### B. PEMBUAT MATERI WORKSPACE (Workspace Produksi Konten)
+- Menu 1: Editor Modul Utama (bi-pencil-square)
+    - Fungsi: Tempat menyusun narasi, teks, dan draf materi akademis.
+    - Skema Data: Menyediakan Form Text Area responsif yang terhubung ke tabel contents. Penulis wajib memilih salah satu kategori kompetensi melalui dropdown indicator_tag sesuai enum database (kognitif, metodologis, kontekstual). Setelah selesai, penulis mengklik tombol [AJUKAN KE PAKAR]. Aksi ini akan mengubah status di tabel courses menjadi review dan seketika mengunci halaman editor ini menjadi Read-Only agar materi tidak dapat dimanipulasi selama proses penilaian.
 
-## 11. SMART E-LEARNING BRIDGE INTERACTION
-- System Engine: Backend ElysiaJS mencocokkan `student_profiles.current_level` dengan `contents.indicator_tag` dan data JSON di `games.config_data`.
-- Data Integration: Tim bertindak sebagai penyuplai data berlabel, sistem web bertindak sebagai penyaring konten adaptif di sisi dashboard Siswa secara real-time.
+- Menu 2: Log Catatan & Kritik Pakar (bi-chat-left-text-fill)
+    - Fungsi: Kotak masuk umpan balik jika materi ditolak.
+    - Skema Data: Jika Pakar menolak draf, status di tabel courses berubah menjadi revision_needed dan editor kembali terbuka. Menu ini akan merender teks riwayat kritik dari tabel reviews berdasarkan ID modul secara kronologis sebagai panduan perbaikan materi.
+
+#### C. PEMBUAT GAME STUDIO (Workspace Gamifikasi)
+- Menu 1: Studio Integrasi Kuis (bi-controller)
+    - Fungsi: Menyisipkan elemen permainan interaktif ke dalam materi yang sedang disusun.
+    - Skema Data: Menggunakan antarmuka Split-Screen Layout. Sisi kiri layar menampilkan teks draf materi dari tabel contents secara statis dan Read-Only sebagai referensi pembuatan soal. Sisi kanan menyediakan form dinamis untuk menyusun tipe permainan sesuai enum database (pilihan_ganda, puzzle, pasang_kata). Ketika tombol [SEMATKAN GAME] diklik, sistem akan mengompilasi data tersebut ke dalam format objek JSON terstruktur dan menyimpannya ke tabel games. Di dalam objek JSON tiap soal, wajib disematkan metadata indicator_tag (kognitif, metodologis, kontekstual) untuk mensuplai sistem penilaian profil siswa.
+
+#### D. PAKAR EVALUASI PANEL (Workspace Audit & Validasi Konten)
+- Menu 1: Antrean Tinjauan Mutu (bi-clipboard-check-fill)
+    - Fungsi: Memeriksa dan menguji kelayakan paket e-learning.
+    - Skema Data: Menampilkan semua proyek di tabel courses yang mana kolom expert_reviewer_id adalah ID Pakar tersebut dan berstatus review. Di dalam menu ini terdapat komponen Live Preview Simulator, sebuah area isolasi yang menggabungkan draf materi dari tabel contents di satu tab, dan me-render langsung purwarupa game interaktif dari tabel games di tab lainnya sehingga Pakar bisa menguji klik fungsionalitasnya.
+
+- Menu 2: Form Keputusan Evaluasi
+    - Fungsi: Memberikan keputusan resmi hasil peninjauan.
+    - Skema Data: Pakar wajib mengisi kolom komentar teks yang akan disimpan ke tabel reviews, lalu memilih satu dari dua tombol keputusan:
+    - Tombol [MINTA REVISI]: Menyimpan status_recommendation sebagai revision_needed di tabel reviews dan mengubah status proyek di tabel courses menjadi revision_needed.
+    - Tombol [SETUJUI / APPROVE]: Menyimpan status_recommendation sebagai approved di tabel reviews dan mengubah status proyek di tabel courses menjadi approved.
+
+#### E. SISWA LEARNING SPACE (Smart Adaptive Learning Workflow)
+- Menu 1: Gerbang Diagnostik / Kuis Pemetaan (bi-clipboard-data-fill)
+    - Fungsi: Mengukur kompetensi dasar siswa baru berdasarkan 3 aspek utama (kognitif, metodologis, kontekstual).
+    - Skema Data: Saat siswa baru pertama kali masuk ke aplikasi, seluruh Ruang Kelas dikunci. Mereka wajib menyelesaikan Kuis Pemetaan awal ini. Begitu selesai, backend ElysiaJS akan menghitung persentase jawaban benar untuk masing-masing pilar skor, lalu memperbarui kolom cognitive_score, methodological_score, dan contextual_score, serta menentukan level global (dasar, menengah, mahir) pada tabel student_profiles.
+
+- Menu 2: Ruang Kelas Adaptif (bi-journal-bookmark-fill)
+    - Fungsi: Menampilkan daftar silabus yang dipersonalisasi.
+    - Skema Data: Berdasarkan data skor kompetensi di student_profiles, database MySQL secara cerdas melakukan filtering untuk membuka kunci modul-modul berstatus published di tabel courses yang memiliki contents.indicator_tag paling sesuai dengan pilar skor terendah/kebutuhan siswa tersebut terlebih dahulu (Personalized Learning Path). Modul dirender dalam bentuk grid kartu lengkap dengan tag kompetensi dan Progress Bar belajar dinamis yang diambil dari tabel progres.
+
+- Menu 3: Mode Belajar & Bermain (bi-play-btn-fill)
+    - Fungsi: Area konsumsi materi pembelajaran interaktif.
+    - Skema Data: Menggunakan Split-Screen Layout. Sisi kiri merender teks materi dari tabel contents (menggunakan format markdown/text leading-relaxed). Sisi kanan memuat engine runtime yang langsung membaca dan menjalankan konfigurasi objek JSON dari tabel games menjadi kuis interaktif sesuai game_type. Tombol "Selesai Modul" terkunci secara mutlak sampai siswa menyelesaikan game dengan batas skor minimum. Begitu sukses, sistem mengupdate status progres modul siswa tersebut menjadi 100% (Selesai).
+
+- Menu 4: Papan Peringkat / Leaderboard (bi-trophy-fill)
+    - Fungsi: Panel motivasi sosial berbasis kompetisi sehat.
+    - Skema Data: Menampilkan peringkat akumulasi nilai siswa secara real-time yang dikalkulasi menggunakan agregasi total skor gabungan (cognitive_score + methodological_score + contextual_score) dari tabel student_profiles.
+
+### III. ARSITEKTUR DATA (DRIZZLE ORM & MYSQL SCHEMAS)
+Berikut adalah detail teknis dari struktur tabel database MySQL menggunakan Drizzle ORM yang harus dipertahankan dan dikembangkan untuk mendukung seluruh fungsionalitas dashboard:
+
+#### A. Spesifikasi Tabel dan Kolom
+- Tabel users (Data Pengguna, Akun & Otorisasi)
+
+    - id: serial().primaryKey() — ID unik otomatis.
+
+    - name: varchar({ length: 255 }).notNull() — Nama lengkap pengguna.
+
+    - email: varchar({ length: 255 }).notNull().unique() — Email unik untuk login.
+
+    - password: varchar({ length: 255 }).notNull() — String password hasil enkripsi hash Bun.password.hash.
+
+    - role: mysqlEnum(['ketua_tim', 'pembuat_materi', 'pembuat_game', 'pakar', 'siswa']).notNull() — Penentu hak akses dashboard.
+
+    - status: mysqlEnum(['pending', 'active', 'inactive']).default('pending') — Status persetujuan akun kolaborator oleh Ketua Tim.
+
+- Tabel courses (Entitas Utama Proyek / Modul & Alokasi PIC)
+
+    - id: serial().primaryKey() — ID unik modul.
+
+    - title: varchar({ length: 255 }).notNull() — Judul modul pembelajaran.
+
+    - description: text() — Deskripsi ringkas mengenai proyek modul.
+
+    - status: mysqlEnum(['draft', 'revision_needed', 'review', 'approved', 'published']).default('draft') — Status workflow manajemen konten global.
+
+    - content_author_id: int().references(() => users.id) — Foreign Key (FK) mengarah ke ID Pembuat Materi yang ditunjuk.
+
+    - game_creator_id: int().references(() => users.id) — Foreign Key (FK) mengarah ke ID Pembuat Game yang ditunjuk.
+
+    - expert_reviewer_id: int().references(() => users.id) — Foreign Key (FK) mengarah ke ID Pakar yang ditunjuk.
+
+- Tabel contents (Draf Materi Tekstual — Relasi 1:1 ke Courses)
+
+    - id: serial().primaryKey()
+
+    - course_id: int().notNull().references(() => courses.id, { onDelete: 'cascade' }) — Terikat mutlak pada satu modul (Cascade Delete).
+
+    - title: varchar({ length: 255 }).notNull() — Judul draf materi.
+
+    - body: text() — Isi materi utama dalam format teks biasa atau markdown.
+
+    - indicator_tag: mysqlEnum(['kognitif', 'metodologis', 'kontekstual']).notNull() — Kategori pilar kompetensi materi untuk kebutuhan filtering adaptif siswa.
+
+- Tabel games (Konfigurasi Gamifikasi Studio — Relasi 1:1 ke Courses)
+
+    - id: serial().primaryKey()
+
+    - course_id: int().notNull().references(() => courses.id, { onDelete: 'cascade' }) — Terikat mutlak pada satu modul (Cascade Delete).
+
+    - game_type: mysqlEnum(['pilihan_ganda', 'puzzle', 'pasang_kata']).notNull() — Format tipe permainan.
+
+    - config_data: json().notNull() — Menyimpan struktur objek JSON (array pertanyaan, pilihan jawaban, kunci jawaban). Wajib menyertakan metadata properti "indicator_tag" pada setiap objek soal di dalam berkas JSON guna suplai kalkulasi ke skor profil siswa.
+
+- Tabel reviews (Log Audit & Kritik Pakar — Relasi 1:N ke Courses)
+
+    - id: serial().primaryKey()
+
+    - course_id: int().notNull().references(() => courses.id, { onDelete: 'cascade' }) — Terikat pada modul yang sedang diaudit.
+
+    - reviewer_id: int().notNull().references(() => users.id) — ID Pakar yang memberikan evaluasi.
+
+    - comment: text().notNull() — Catatan kritik, koreksi, atau alasan penolakan draf materi/game.
+
+    - status_recommendation: mysqlEnum(['revision_needed', 'approved']).notNull() — Rekomendasi status pasca peninjauan.
+
+- Tabel student_profiles (Pusat Kompetensi Skor Siswa — Relasi 1:1 ke Users)
+
+    - id: serial().primaryKey()
+
+    - user_id: int().notNull().references(() => users.id, { onDelete: 'cascade' }) — Terikat langsung pada ID pengguna ber-role 'siswa'.
+
+    - cognitive_score: int().default(0) — Akumulasi/skor pemetaan kompetensi kognitif.
+
+    - methodological_score: int().default(0) — Akumulasi/skor pemetaan kompetensi metodologis.
+
+    - contextual_score: int().default(0) — Akumulasi/skor pemetaan kompetensi kontekstual.
+
+    - current_level: mysqlEnum(['dasar', 'menengah', 'mahir']).default('dasar') — Level klasifikasi global siswa hasil kalkulasi kuis diagnostik.
+
+- Tabel student_progress (Tabel Tambahan — Pelacak Progres Modul Siswa — Relasi N:M)
+
+    - id: serial().primaryKey()
+
+    student_id: int().notNull().references(() => users.id, { onDelete: 'cascade' }) — ID siswa yang belajar.
+
+    - course_id: int().notNull().references(() => courses.id, { onDelete: 'cascade' }) — ID modul yang diakses.
+
+    - score_obtained: int().default(0) — Skor yang diperoleh siswa saat menyelesaikan game pada modul tersebut.
+
+    - is_completed: boolean().default(false) — Status kelulusan modul (Jika true, menaikkan progress bar di Ruang Kelas menjadi 100%).
+
+#### B. Peta Relasi Data (Entity Relationship & Workflow Mapping)
+Relasi Agregasi Multi-PIC (users ➔ courses): Tabel courses mengontrol alokasi kerja tim secara ringkas melalui tiga relasi foreign-key searah ke tabel users (content_author_id, game_creator_id, expert_reviewer_id). Struktur ini memudahkan backend melakukan filtering data ruang kerja kolaborator hanya dengan satu operasi WHERE.
+
+Relasi Integrasi Produksi Konten (courses ↔ contents & games): Bersifat One-to-One (1:1) kuat dengan aturan Cascade Delete. Penghapusan sebuah modul (courses) otomatis membersihkan draf teks materi di tabel contents dan struktur data kuis di tabel games tanpa meninggalkan data sampah di MySQL.
+
+Siklus Log Catatan Audit (courses ➔ reviews): Bersifat One-to-Many (1:N). Satu entitas modul dapat memiliki banyak baris catatan di tabel reviews. Hal ini krusial agar Pembuat Materi dan Pembuat Game dapat melihat rekam jejak revisi historis dari Pakar setiap kali status modul terlempar kembali menjadi revision_needed.
+
+Mekanisme Smart Adaptive Learning (student_profiles ➔ contents ➔ student_progress):
+
+Kuis Diagnostik memetakan nilai awal ke komponen student_profiles.
+
+Sistem melakukan pencocokan (Smart Matching) antara skor terendah di student_profiles dengan kolom indicator_tag pada tabel contents.
+
+Relasi Many-to-Many (N:M) pada tabel perantara student_progress menjembatani interaksi belajar adaptif ini dengan merekam riwayat modul mana saja yang sudah diselesaikan siswa beserta skor gamifikasi yang mereka dapatkan dari engine game JSON.
