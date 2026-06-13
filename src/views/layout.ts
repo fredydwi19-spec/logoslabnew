@@ -1,4 +1,6 @@
-export const htmlLayout = (title: string, body: string) => `
+import { renderSidebar } from './components/sidebar';
+
+export const htmlLayout = (title: string, body: string, role?: string) => `
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -37,7 +39,11 @@ export const htmlLayout = (title: string, body: string) => `
   </script>
 </head>
 <body class="bg-slate-50 font-sans text-navy min-h-screen flex flex-col">
-  ${body}
+  ${role ? renderSidebar(role) : ''}
+  <div class="${role ? 'ml-16' : ''} flex-1 flex flex-col transition-all duration-300 ease-in-out">
+    ${body}
+  </div>
 </body>
 </html>
 `;
+
