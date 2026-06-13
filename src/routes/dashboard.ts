@@ -1,9 +1,11 @@
 import { Elysia } from "elysia";
 import { rbacPlugin, requireRole } from "../plugins/rbac";
+import { authPlugin } from "../plugins/auth";
 import { htmlLayout } from "../views/layout";
 
 export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
   .use(rbacPlugin)
+  .use(authPlugin)
   
   // ==========================================
   // KETUA TIM DASHBOARD
