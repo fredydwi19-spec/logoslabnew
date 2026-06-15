@@ -19,8 +19,9 @@ async function seedAdmin() {
   await db.insert(users).values({
     name: "Ketua Tim Default",
     email: adminEmail,
-    passwordHash: passwordHash,
-    role: "KETUA_TIM"
+    password: passwordHash,
+    role: "ketua_tim",
+    status: "active"
   });
 
   console.log("✅ Berhasil membuat akun Ketua Tim:");

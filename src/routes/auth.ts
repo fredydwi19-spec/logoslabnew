@@ -25,7 +25,7 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
     await db.insert(users).values({
       name,
       email,
-      passwordHash,
+      password: passwordHash,
       role,
     });
 
@@ -37,11 +37,11 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
       email: t.String({ format: "email" }),
       password: t.String({ minLength: 8 }),
       role: t.Union([
-        t.Literal("KETUA_TIM"),
-        t.Literal("PEMBUAT_MATERI"),
-        t.Literal("PEMBUAT_GAME"),
-        t.Literal("PAKAR"),
-        t.Literal("SISWA"),
+        t.Literal("ketua_tim"),
+        t.Literal("pembuat_materi"),
+        t.Literal("pembuat_game"),
+        t.Literal("pakar"),
+        t.Literal("siswa"),
       ]),
     })
   })
@@ -58,7 +58,7 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
     }
 
     // Verify password
-    const isPasswordValid = await Bun.password.verify(password, user.passwordHash);
+    const isPasswordValid = await Bun.password.verify(password, user.password);
     if (!isPasswordValid) {
       set.status = 401;
       return { success: false, message: "Email atau password salah" };
@@ -90,9 +90,14 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
   })
 
   // Endpoint: Logout
-  .post("/logout", ({ cookie }) => {
+  .post("/logout", ({ cookie, set }) => {
     if (cookie.session) {
       cookie.session.remove();
     }
-    return { success: true, message: "Berhasil logout" };
+    set.status = 302;
+    set.headers['Location'] = '/';
+    return new Response(null, {
+      status: 302,
+      headers: { Location: '/' },
+    });
   });

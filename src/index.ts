@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { staticPlugin } from "@elysiajs/static";
 import { authRoutes } from "./routes/auth";
+import { dashboardRoutes } from "./routes/dashboard";
 import { renderLanding } from "./views/landing";
 import { renderLogin } from "./views/login";
 import { renderRegister } from "./views/register";
@@ -11,6 +12,7 @@ const app = new Elysia()
   
   // Daftar route API Backend
   .use(authRoutes)
+  .use(dashboardRoutes)
   
   // Daftar route UI Frontend (Mengembalikan HTML)
   .get("/", () => new Response(renderLanding(), { headers: { "Content-Type": "text/html" } }))

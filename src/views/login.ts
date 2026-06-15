@@ -33,7 +33,13 @@ export const renderLogin = () => {
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
               </div>
-              <input type="password" id="password" name="password" required placeholder="••••••••" class="pl-10 w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-colors" />
+              <input type="password" id="password" name="password" required placeholder="••••••••" class="pl-10 pr-10 w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-colors" />
+              <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-navy transition-colors focus:outline-none">
+                <svg id="eyeIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                  <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -50,6 +56,18 @@ export const renderLogin = () => {
 
     <!-- Script to handle JSON post to our API -->
     <script>
+      function togglePassword() {
+        const pwd = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+        if (pwd.type === 'password') {
+          pwd.type = 'text';
+          eyeIcon.innerHTML = '<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755l-.809-.805zm-4.723-4.723L9.673 5.48a2.5 2.5 0 0 0-2.153-2.152l.969.969a1.5 1.5 0 0 1 1.147 1.146zm-2.022 2.022L5.58 7.502a1.5 1.5 0 0 1 1.918 1.918l1.034 1.034a2.5 2.5 0 0 0-2.918-2.918zm4.35 4.35-.916-.916a5.952 5.952 0 0 1-2.048.361c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8c.058-.087.122-.183.195-.288.335-.48.83-1.12 1.465-1.755l-1.6-1.6-.708.708 13.5 13.5.708-.708-2.083-2.083zM2.64 5.467A14.288 14.288 0 0 0 0 8s3 5.5 8 5.5c.87 0 1.7-.156 2.47-.435l-1.63-1.63a4.952 4.952 0 0 1-3.32-3.32L2.64 5.467z"/>';
+        } else {
+          pwd.type = 'password';
+          eyeIcon.innerHTML = '<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>';
+        }
+      }
+
       async function handleLogin(e) {
         e.preventDefault();
         const form = e.target;
@@ -81,11 +99,11 @@ export const renderLogin = () => {
 
           // Redirect based on role
           const rolePath = {
-            'KETUA_TIM': 'ketua',
-            'PEMBUAT_MATERI': 'pembuat-materi',
-            'PEMBUAT_GAME': 'pembuat-game',
-            'PAKAR': 'pakar',
-            'SISWA': 'siswa'
+            'ketua_tim': 'ketua',
+            'pembuat_materi': 'materi',
+            'pembuat_game': 'game',
+            'pakar': 'pakar',
+            'siswa': 'siswa'
           };
           window.location.href = '/dashboard/' + (rolePath[data.role] || 'siswa');
 

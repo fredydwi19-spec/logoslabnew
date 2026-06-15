@@ -1,4 +1,4 @@
-import { mysqlTable, serial, varchar, text, mysqlEnum, int, json, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, serial, varchar, text, mysqlEnum, int, json, timestamp, boolean } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 export const users = mysqlTable('users', {
@@ -19,6 +19,8 @@ export const courses = mysqlTable('courses', {
   contentAuthorId: int('content_author_id').references(() => users.id),
   gameCreatorId: int('game_creator_id').references(() => users.id),
   expertReviewerId: int('expert_reviewer_id').references(() => users.id),
+  indicatorTag: mysqlEnum('indicator_tag', ['kognitif', 'metodologis', 'kontekstual']).default('kognitif').notNull(),
+  currentLevel: mysqlEnum('current_level', ['dasar', 'menengah', 'mahir']).default('dasar').notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -55,6 +57,14 @@ export const studentProfiles = mysqlTable('student_profiles', {
   currentLevel: mysqlEnum('current_level', ['dasar', 'menengah', 'mahir']).default('dasar').notNull(),
 });
 
+export const studentProgress = mysqlTable('student_progress', {
+  id: int('id').autoincrement().primaryKey(),
+  studentId: int('student_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  courseId: int('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  scoreObtained: int('score_obtained').default(0),
+  isCompleted: boolean('is_completed').default(false),
+});
+
 // Definisi Relasi untuk Query mempermudah Join
 export const usersRelations = relations(users, ({ many }) => ({
   coursesAuthored: many(courses, { relationName: 'contentAuthor' }),
@@ -62,6 +72,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   coursesReviewed: many(courses, { relationName: 'expertReviewer' }),
   reviews: many(reviews),
   profile: many(studentProfiles),
+  progress: many(studentProgress),
 }));
 
 export const coursesRelations = relations(courses, ({ one, many }) => ({
@@ -83,6 +94,7 @@ export const coursesRelations = relations(courses, ({ one, many }) => ({
   contents: many(contents),
   games: many(games),
   reviews: many(reviews),
+  studentProgress: many(studentProgress),
 }));
 
 export const contentsRelations = relations(contents, ({ one }) => ({
@@ -117,6 +129,17 @@ export const studentProfilesRelations = relations(studentProfiles, ({ one }) => 
   }),
 }));
 
+export const studentProgressRelations = relations(studentProgress, ({ one }) => ({
+  student: one(users, {
+    fields: [studentProgress.studentId],
+    references: [users.id],
+  }),
+  course: one(courses, {
+    fields: [studentProgress.courseId],
+    references: [courses.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Course = typeof courses.$inferSelect;
@@ -129,3 +152,5 @@ export type Review = typeof reviews.$inferSelect;
 export type NewReview = typeof reviews.$inferInsert;
 export type StudentProfile = typeof studentProfiles.$inferSelect;
 export type NewStudentProfile = typeof studentProfiles.$inferInsert;
+export type StudentProgress = typeof studentProgress.$inferSelect;
+export type NewStudentProgress = typeof studentProgress.$inferInsert;

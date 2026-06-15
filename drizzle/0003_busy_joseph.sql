@@ -1,0 +1,2 @@
+ALTER TABLE `courses` ADD `indicator_tag` enum('kognitif','metodologis','kontekstual') DEFAULT 'kognitif' NOT NULL;--> statement-breakpoint
+ALTER TABLE `courses` ADD `current_level` enum('dasar','menengah','mahir') DEFAULT 'dasar' NOT NULL;

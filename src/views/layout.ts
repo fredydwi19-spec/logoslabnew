@@ -1,4 +1,6 @@
-export const htmlLayout = (title: string, body: string) => `
+import { renderSidebar } from './components/sidebar';
+
+export const htmlLayout = (title: string, body: string, role?: string) => `
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -13,6 +15,9 @@ export const htmlLayout = (title: string, body: string) => `
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
   <!-- Tailwind Configuration for 60-30-10 Rule -->
   <script>
@@ -37,7 +42,11 @@ export const htmlLayout = (title: string, body: string) => `
   </script>
 </head>
 <body class="bg-slate-50 font-sans text-navy min-h-screen flex flex-col">
-  ${body}
+  ${role ? renderSidebar(role) : ''}
+  <div class="${role ? 'ml-16' : ''} flex-1 flex flex-col transition-all duration-300 ease-in-out">
+    ${body}
+  </div>
 </body>
 </html>
 `;
+
