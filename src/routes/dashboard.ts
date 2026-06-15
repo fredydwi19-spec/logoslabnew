@@ -126,8 +126,8 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
           </div>
 
           <!-- Modal Tambah Proyek -->
-          <div x-show="modalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 transition-opacity" style="display: none;">
-            <div @click.away="modalOpen = false" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+          <div x-show="modalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 transition-opacity p-4" style="display: none;">
+            <div @click.away="modalOpen = false" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
               <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-navy">Buat Proyek Baru</h2>
                 <button @click="modalOpen = false" class="text-gray-400 hover:text-gray-600">
