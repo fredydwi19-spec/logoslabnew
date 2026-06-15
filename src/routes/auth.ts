@@ -90,9 +90,9 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
   })
 
   // Endpoint: Logout
-  .post("/logout", ({ cookie }) => {
+  .post("/logout", ({ cookie, set }) => {
     if (cookie.session) {
       cookie.session.remove();
     }
-    return { success: true, message: "Berhasil logout" };
+    set.redirect = "/";
   });
