@@ -19,6 +19,8 @@ export const courses = mysqlTable('courses', {
   contentAuthorId: int('content_author_id').references(() => users.id),
   gameCreatorId: int('game_creator_id').references(() => users.id),
   expertReviewerId: int('expert_reviewer_id').references(() => users.id),
+  indicatorTag: mysqlEnum('indicator_tag', ['kognitif', 'metodologis', 'kontekstual']).default('kognitif').notNull(),
+  currentLevel: mysqlEnum('current_level', ['dasar', 'menengah', 'mahir']).default('dasar').notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

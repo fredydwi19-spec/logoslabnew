@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { rbacPlugin, requireRole } from "../plugins/rbac";
 import { htmlLayout } from "../views/layout";
 import { jwt } from "@elysiajs/jwt";
@@ -27,10 +27,14 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
   .group("/ketua", (app) => app
     .use(requireRole(['ketua_tim']))
     .get("/", async (ctx: any) => {
-      const [{ totalProyek }] = await db.select({ totalProyek: sql`count(*)`.mapWith(Number) }).from(courses);
-      const [{ modulReview }] = await db.select({ modulReview: sql`count(*)`.mapWith(Number) }).from(courses).where(eq(courses.status, 'review'));
-      const [{ anggotaAktif }] = await db.select({ anggotaAktif: sql`count(*)`.mapWith(Number) }).from(users).where(and(inArray(users.role, ['pembuat_materi', 'pembuat_game', 'pakar']), eq(users.status, 'active')));
-      const [{ totalSiswa }] = await db.select({ totalSiswa: sql`count(*)`.mapWith(Number) }).from(users).where(eq(users.role, 'siswa'));
+      const totalProyekResult = await db.select({ totalProyek: sql`count(*)`.mapWith(Number) }).from(courses);
+      const totalProyek = totalProyekResult[0]?.totalProyek ?? 0;
+      const modulReviewResult = await db.select({ modulReview: sql`count(*)`.mapWith(Number) }).from(courses).where(eq(courses.status, 'review'));
+      const modulReview = modulReviewResult[0]?.modulReview ?? 0;
+      const anggotaAktifResult = await db.select({ anggotaAktif: sql`count(*)`.mapWith(Number) }).from(users).where(and(inArray(users.role, ['pembuat_materi', 'pembuat_game', 'pakar']), eq(users.status, 'active')));
+      const anggotaAktif = anggotaAktifResult[0]?.anggotaAktif ?? 0;
+      const totalSiswaResult = await db.select({ totalSiswa: sql`count(*)`.mapWith(Number) }).from(users).where(eq(users.role, 'siswa'));
+      const totalSiswa = totalSiswaResult[0]?.totalSiswa ?? 0;
 
       const content = `
         <div class="p-8">
@@ -82,9 +86,9 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
     })
     .get("/proyek", async (ctx: any) => {
       const allCourses = await db.select().from(courses);
-      const materiUsers = await db.select().from(users).where(eq(users.role, 'pembuat_materi'));
-      const gameUsers = await db.select().from(users).where(eq(users.role, 'pembuat_game'));
-      const expertUsers = await db.select().from(users).where(eq(users.role, 'pakar'));
+      const materiUsers = await db.select().from(users).where(and(eq(users.role, 'pembuat_materi'), eq(users.status, 'active')));
+      const gameUsers = await db.select().from(users).where(and(eq(users.role, 'pembuat_game'), eq(users.status, 'active')));
+      const expertUsers = await db.select().from(users).where(and(eq(users.role, 'pakar'), eq(users.status, 'active')));
 
       const courseCards = allCourses.map(c => `
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
@@ -100,8 +104,16 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
         </div>
       `).join('');
 
+      const successBanner = ctx.query?.success === '1' ? `
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-6 py-3 rounded-xl flex items-center gap-3">
+          <i class="bi bi-check-circle-fill text-green-500 text-xl"></i>
+          <span class="font-medium">Proyek baru berhasil dibuat dan masuk dalam status <strong>Draft</strong>.</span>
+        </div>
+      ` : '';
+
       const content = `
         <div class="p-8" x-data="{ modalOpen: false }">
+          ${successBanner}
           <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-display font-bold text-navy">Manajemen Proyek</h1>
             <button @click="modalOpen = true" class="bg-orange hover:bg-orange-hover text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
@@ -122,31 +134,103 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
                   <i class="bi bi-x-lg text-xl"></i>
                 </button>
               </div>
-              <form action="/api/courses" method="POST" class="flex flex-col gap-4">
+              <form action="/dashboard/ketua/proyek" method="POST" class="flex flex-col gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Judul Proyek</label>
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Judul Proyek</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm transition-colors"></i>
+                      <div class="absolute left-6 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-xl leading-relaxed pointer-events-none">
+                        Masukkan judul global modul pembelajaran Alkitab (Contoh: Sejarah Raja-Raja Israel atau Hermeneutika Dasar).
+                      </div>
+                    </div>
+                  </div>
                   <input type="text" name="title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none transition-shadow">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm transition-colors"></i>
+                      <div class="absolute left-6 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-xl leading-relaxed pointer-events-none">
+                        Berikan ringkasan cakupan isi materi akademis yang akan diproduksi oleh tim.
+                      </div>
+                    </div>
+                  </div>
                   <textarea name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none transition-shadow"></textarea>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Pembuat Materi (PIC)</label>
+                  <div class="flex items-center gap-1 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Kategori Dimensi</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm"></i>
+                      <div class="absolute left-5 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-lg leading-relaxed">
+                        Pilih fokus utama modul: <strong>Kognitif</strong> (Pengetahuan/Sejarah), <strong>Metodologis</strong> (Alat/Cara Tafsir), atau <strong>Kontekstual</strong> (Penerapan/Pelayanan) untuk kebutuhan jalur belajar adaptif siswa.
+                      </div>
+                    </div>
+                  </div>
+                  <select name="indicator_tag" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none">
+                    <option value="kognitif">Kognitif — Pengetahuan & Sejarah Alkitab</option>
+                    <option value="metodologis">Metodologis — Alat & Pendekatan Tafsir</option>
+                    <option value="kontekstual">Kontekstual — Penerapan & Pelayanan</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Level Target Mahasiswa</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm"></i>
+                      <div class="absolute left-5 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-lg leading-relaxed">
+                        Tentukan tingkatan kesulitan modul yang disesuaikan dengan profil tingkat kemampuan mahasiswa.
+                      </div>
+                    </div>
+                  </div>
+                  <select name="current_level" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none">
+                    <option value="dasar">Dasar</option>
+                    <option value="menengah">Menengah</option>
+                    <option value="mahir">Mahir</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Pembuat Materi (PIC)</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm transition-colors"></i>
+                      <div class="absolute left-6 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-xl leading-relaxed pointer-events-none">
+                        Tugaskan kolaborator berstatus 'active' yang bertanggung jawab pada workspace penulisan materi.
+                      </div>
+                    </div>
+                  </div>
                   <select name="contentAuthorId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none">
                     <option value="">-- Pilih --</option>
                     ${materiUsers.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
                   </select>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Pembuat Game (PIC)</label>
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Pembuat Game (PIC)</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm transition-colors"></i>
+                      <div class="absolute left-6 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-xl leading-relaxed pointer-events-none">
+                        Tugaskan kolaborator berstatus 'active' yang bertanggung jawab pada workspace pembuatan game edukasi.
+                      </div>
+                    </div>
+                  </div>
                   <select name="gameCreatorId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none">
                     <option value="">-- Pilih --</option>
                     ${gameUsers.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
                   </select>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Pakar Evaluasi (PIC)</label>
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Pakar Evaluasi (PIC)</label>
+                    <div class="relative group/tip">
+                      <i class="bi bi-info-circle text-gray-400 hover:text-navy cursor-pointer text-sm transition-colors"></i>
+                      <div class="absolute left-6 top-0 z-[200] hidden group-hover/tip:block w-64 bg-navy text-white text-xs rounded-lg p-3 shadow-xl leading-relaxed pointer-events-none">
+                        Tugaskan kolaborator berstatus 'active' yang bertanggung jawab sebagai reviewer materi dan game.
+                      </div>
+                    </div>
+                  </div>
                   <select name="expertReviewerId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-navy outline-none">
                     <option value="">-- Pilih --</option>
                     ${expertUsers.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
@@ -162,6 +246,81 @@ export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
         </div>
       `;
       return new Response(htmlLayout("Manajemen Proyek", content, ctx.localRole), { headers: { "Content-Type": "text/html" } });
+    })
+    // POST /dashboard/ketua/proyek
+    // Menangani submit form "Buat Proyek Baru" dari Ketua Tim.
+    // Menyimpan baris kursus baru ke tabel courses dengan status awal 'draft'.
+    .post("/proyek", async (ctx: any) => {
+      // 1. Ekstrak & validasi body form
+      const {
+        title,
+        description,
+        contentAuthorId,
+        gameCreatorId,
+        expertReviewerId,
+        indicator_tag,
+        current_level,
+      } = ctx.body;
+
+      // 2. Guard: title wajib ada
+      if (!title || title.trim() === '') {
+        ctx.set.status = 400;
+        return new Response('Judul proyek wajib diisi.', { status: 400 });
+      }
+
+      // SISTEM TAGGING KOMPETENSI LOGOSLAB
+      // ─────────────────────────────────────────────────────────────────
+      // KOGNITIF (Teks & Sejarawhi):
+      //   Fokus pada pengetahuan dasar Alkitab — fakta teks, latar belakang
+      //   sejarah, survei PL/PB, isagogik, peta rute perjalanan misi rasul.
+      //
+      // METODOLOGIS (Alat & Pendekatan Tafsir):
+      //   Fokus pada perkakas eksegesis & hermeneutika — analisis
+      //   sastra/genre, kritik teks, studi bahasa Yunani/Ibrani.
+      //
+      // KONTEKSTUAL (Penerapan & Pelayanan):
+      //   Fokus pada aktualisasi firman ke hidup praktis — homiletika,
+      //   konseling pastoral, etika Kristen, misiologi kontekstual.
+      // ─────────────────────────────────────────────────────────────────
+
+      // 3. Eksekusi insert ke MySQL via Drizzle ORM
+      await db.insert(courses).values({
+        title: title.trim(),
+        description: description?.trim() || null,
+        status: 'draft', // Otomatis, tidak dari form
+        contentAuthorId: contentAuthorId ? parseInt(contentAuthorId) : null,
+        gameCreatorId: gameCreatorId ? parseInt(gameCreatorId) : null,
+        expertReviewerId: expertReviewerId ? parseInt(expertReviewerId) : null,
+        indicatorTag: indicator_tag || 'kognitif',
+        currentLevel: current_level || 'dasar',
+      });
+
+      // 4. Redirect kembali ke halaman daftar proyek setelah berhasil
+      ctx.set.status = 302;
+      ctx.set.headers['Location'] = '/dashboard/ketua/proyek?success=1';
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/dashboard/ketua/proyek?success=1' },
+      });
+    }, {
+      // 5. Validasi tipe input menggunakan Elysia t schema
+      body: t.Object({
+        title: t.String({ minLength: 3 }),
+        description: t.Optional(t.String()),
+        contentAuthorId: t.Optional(t.String()),
+        gameCreatorId: t.Optional(t.String()),
+        expertReviewerId: t.Optional(t.String()),
+        indicator_tag: t.Optional(t.Union([
+          t.Literal('kognitif'),
+          t.Literal('metodologis'),
+          t.Literal('kontekstual'),
+        ])),
+        current_level: t.Optional(t.Union([
+          t.Literal('dasar'),
+          t.Literal('menengah'),
+          t.Literal('mahir'),
+        ])),
+      })
     })
     .get("/tim", async (ctx: any) => {
       const pendingUsers = await db.select().from(users).where(eq(users.status, 'pending'));
