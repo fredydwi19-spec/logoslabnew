@@ -1,0 +1,45 @@
+Buatkan issue.md berisi planning untuk membuat ini:
+
+Buat project baru di folder ini menggunakan Bun
+
+Gunakan dependensi: 
+1. ElysiaJS
+2. Drizzle
+3. MySQL
+
+jangan terlalu lowlevel atau detail
+cukup instruksikan secara high level
+nanti dokumen planningnya akan digunakan oleh programmer atau model yang lebih murah   
+
+
+Halo High Agent. Kita baru memulai proyek e-learning LogosLAB menggunakan Bun, ElysiaJS, Drizzle ORM, dan MySQL. Saat ini database belum dibuat dan koneksi database belum dikonfigurasi sama sekali.
+Sesuai dengan instruksi di highagent.md, tolong baca ARCHITECTURE.md di root folder untuk melihat tech stack kita. Setelah itu, buatkan sebuah GitHub Issue menggunakan perintah CLI (temp_issue.md) yang berisi Tasklist Detail untuk Setup Koneksi Database MySQL menggunakan Drizzle ORM dan Bun.
+Di dalam tasklist tersebut, berikan panduan kepada Low Agent tentang:
+Struktur file konfigurasi database (misal: src/db/index.ts dan drizzle.config.ts).
+Contoh penulisan variabel lingkungan (.env) yang dibutuhkan (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME).
+Perintah terminal menggunakan Bun untuk melakukan instalasi package yang diperlukan (seperti drizzle-orm dan mysql2).
+Langkah-langkah bagi saya (User) untuk membuat database kosong di MySQL lokal saya terlebih dahulu sebelum Low Agent menjalankan migrasi.
+Ingat aturan Execution Ban, jangan tulis kode operasional di sini. Berikan link URL GitHub Issue yang sukses kamu buat di akhir chat.
+
+
+
+
+Halo. Kita akan mulai membangun website LogosLAB menggunakan Bun, ElysiaJS, Drizzle ORM, dan MySQL. Sesuai dengan highagent.md, tugasmu saat ini adalah membaca ARCHITECTURE.md di root folder untuk memahami konteks.
+Setelah itu, tolong rancang Fitur Autentikasi, Login, dan Registrasi Pengguna dengan Role-Based Access Control (RBAC) untuk peran: Ketua Tim, Pembuat Materi, Pembuat Game, dan Pakar. Patuhi aturan pembagian fase, dan buatlah detail tasklist-nya ke dalam GitHub Issue menggunakan perintah CLI (temp_issue.md). Berikan URL Issue-nya di akhir chat.
+
+
+Halo High Agent. Koneksi database MySQL menggunakan Drizzle sudah berhasil dikonfigurasi. Sekarang, sebelum masuk ke fitur utama, kita perlu membuat Pintu Masuk Aplikasi (Landing Page, Login/Register Page, dan Integrasi Autentikasi Backend).
+
+Sesuai dengan aturan di highagent.md, tolong baca ARCHITECTURE.md di root folder untuk melihat status koneksi database saat ini. Setelah itu, buatlah sebuah GitHub Issue menggunakan perintah CLI (temp_issue.md) dengan judul 'Fitur: Entry Point - Landing Page, Login, dan RBAC Auth Backend'.
+
+Pastikan di dalam Task List GitHub Issue tersebut memuat detail yang sangat rinci mengenai:
+
+Phase UI/UX: Pembuatan struktur HTML/Tailwind untuk Landing Page (clean theme), Login Page, dan Register Page. Patuhi aturan warna 60-30-10, jenis font, serta letakkan logo LogosLAB resmi dari path /public/assets/Logo LogosLAB.png di halaman tersebut.
+
+Phase Database: Skema tabel users di Drizzle ORM yang mendefinisikan kolom ID, nama, email, password (hashed), dan role (enum: ketua_tim, pembuat_materi, pembuat_game, pakar, siswa).
+
+Phase Backend API: Pembuatan endpoint /api/auth/register dan /api/auth/login menggunakan ElysiaJS dengan validasi input t.box.
+
+Phase Integrasi & Security: Bagaimana form login di frontend mengirim data ke API backend secara aman.
+
+Ingat aturan Execution Ban di Phase 1, jangan tulis kode implementasi penuh di sini. Selesaikan tugasmu dengan memberikan link URL GitHub Issue yang valid."

@@ -401,7 +401,7 @@ Sidebar bersifat **responsif dan berbasis peran**. Perilakunya:
 |---|---|---|---|
 | `POST` | `/api/auth/register` | ❌ Public | Mendaftarkan pengguna baru. Status awal: `pending`. |
 | `POST` | `/api/auth/login` | ❌ Public | Login. Set cookie `session` (JWT, httpOnly, 7 hari). |
-| `POST` | `/api/auth/logout` | ❌ Public | Logout. Hapus cookie `session`. |
+| `POST` | `/api/auth/logout` | ❌ Public | Logout. Hapus cookie `session`. Melakukan redirect (302) kembali ke beranda `/`. |
 
 **Body Register:**
 ```json
@@ -534,3 +534,10 @@ Drizzle Kit digunakan untuk manajemen migrasi. File migrasi tersimpan di folder 
 ### 14.4 Menambahkan Menu Sidebar
 1. Buka `src/views/components/sidebar.ts`.
 2. Tambahkan tag `<a>` baru ke blok kondisional `if (role === '...')` yang sesuai.
+
+---
+
+## 15. Catatan Perbaikan (Changelog) Terkini
+
+- **[UI] Scrollable Modal:** Modal "Buat Proyek Baru" pada Dashboard Ketua Tim kini mendukung _scroll behavior_ vertikal (`max-h-[90vh] overflow-y-auto`) agar tetap responsif pada layar beresolusi kecil dan form tidak terpotong.
+- **[Auth] Fix Logout Redirect:** Endpoint `POST /api/auth/logout` dimodifikasi dari semula mengembalikan respons JSON menjadi mengirimkan standar objek `Response` (HTTP Status 302) agar pengalihan ke beranda (_landing page_) berhasil dieksekusi secara mulus pasca _form submission_.
