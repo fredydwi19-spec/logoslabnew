@@ -94,5 +94,10 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
     if (cookie.session) {
       cookie.session.remove();
     }
-    set.redirect = "/";
+    set.status = 302;
+    set.headers['Location'] = '/';
+    return new Response(null, {
+      status: 302,
+      headers: { Location: '/' },
+    });
   });
